@@ -2679,6 +2679,19 @@ func (f *Fs) Move(ctx context.Context, src fs.Object, remote string) (fs.Object,
 		remote = remote[:len(remote)-len(ext)]
 	}
 
+	obj, err := f.Copy(ctx, src, remote)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = f.delete(ctx, srcObj.id, false)
+
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
+
 	_, srcParentID, err := srcObj.fs.dirCache.FindPath(ctx, src.Remote(), false)
 	if err != nil {
 		return nil, err
